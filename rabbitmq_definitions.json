@@ -1,0 +1,9 @@
+{
+    "queues": [
+      {
+        "name": "rbq_queue",
+        "durable": true
+      }
+    ]
+}
+  

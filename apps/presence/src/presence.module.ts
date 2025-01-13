@@ -3,6 +3,7 @@ import { PresenceController } from './presence.controller';
 import { PresenceService } from './presence.service';
 import { SharedModule } from '@app/shared';
 import { ConfigModule } from '@nestjs/config';
+import { PostgresDBModule } from '@app/shared/postgresdb.module';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: './.env'
     }),
-    SharedModule
+    SharedModule,    
   ],
   controllers: [PresenceController],
   providers: [PresenceService],

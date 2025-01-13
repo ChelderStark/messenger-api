@@ -1,5 +1,5 @@
-import { NestFactory } from '@nestjs/core';
 import { SharedService } from '@app/shared';
+import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { PresenceModule } from './presence.module';
 

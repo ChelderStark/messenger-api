@@ -18,13 +18,6 @@ export class AuthController {
       return this.authService.getUsers()
   }
 
-  @MessagePattern({ cmd: 'post-user' })
-  async postUser(@Ctx() context: RmqContext){
-    this.sharedService.acknowledgeMessage(context)
-
-    return this.authService.postUser()
-  }
-
   @MessagePattern({ cmd: 'register' })
   async register(
     @Ctx() context: RmqContext,
@@ -32,6 +25,6 @@ export class AuthController {
   ){
     this.sharedService.acknowledgeMessage(context)
 
-    return this.authService.postUser()
+    return this.authService.register(newUser)
   }
 }

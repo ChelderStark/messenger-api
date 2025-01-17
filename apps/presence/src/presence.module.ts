@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PresenceController } from './presence.controller';
 import { PresenceService } from './presence.service';
-import { SharedModule } from '@app/shared';
+import { AuthGuard, SharedModule } from '@app/shared';
 import { ConfigModule } from '@nestjs/config';
 import { PostgresDBModule } from '@app/shared/postgresdb.module';
 
@@ -11,7 +11,8 @@ import { PostgresDBModule } from '@app/shared/postgresdb.module';
       isGlobal: true,
       envFilePath: './.env'
     }),
-    SharedModule,    
+    SharedModule,
+    // SharedModule.registerRmq('AUTH_SERVICE', process.env.RABBITMQ_AUTH_QUEUE),
   ],
   controllers: [PresenceController],
   providers: [PresenceService],

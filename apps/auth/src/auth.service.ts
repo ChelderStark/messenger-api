@@ -60,14 +60,15 @@ export class AuthService {
   }
 
   async validateUser(email:string, password: string): Promise<UserEntity> {
-    const user = await this.findByEmail(email);
-
+    const user = await this.findByEmail(email);   
+    
     const doesUserExists = !!user
     if(!doesUserExists) return null
-
+    
     const doesPasswordMatch = await this.doesPasswordMatch(password, user.password)
-    if(doesPasswordMatch) return null
-
+    
+    if(!doesPasswordMatch) return null
+    
     return user;
   }
 
@@ -75,11 +76,16 @@ export class AuthService {
     const {email, password} = existingUser;
     const user = await this.validateUser(email, password);
 
+    console.log(user);
+    
+
     if(!user) {
       throw new UnauthorizedException()
     }
 
     const jwt = await this.jwtService.signAsync({ user });
+    console.log(jwt);
+    
 
     return {token: jwt}
   }

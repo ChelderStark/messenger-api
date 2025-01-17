@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -6,11 +6,14 @@ import { Repository } from 'typeorm';
 
 import { UserEntity } from './user.entity';
 import { NewUserDto } from './dto/new-user.dto';
+import { ExistingUserDto } from './dto/existing-user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>
+    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
   ){}
 
   async getUsers(){
@@ -50,5 +53,47 @@ export class AuthService {
 
     delete savedUser.password
     return savedUser;
+  }
+
+  async doesPasswordMatch(password: string, hashedPassword: string): Promise<Boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  async validateUser(email:string, password: string): Promise<UserEntity> {
+    const user = await this.findByEmail(email);
+
+    const doesUserExists = !!user
+    if(!doesUserExists) return null
+
+    const doesPasswordMatch = await this.doesPasswordMatch(password, user.password)
+    if(doesPasswordMatch) return null
+
+    return user;
+  }
+
+  async login(existingUser: Readonly<ExistingUserDto>) {
+    const {email, password} = existingUser;
+    const user = await this.validateUser(email, password);
+
+    if(!user) {
+      throw new UnauthorizedException()
+    }
+
+    const jwt = await this.jwtService.signAsync({ user });
+
+    return {token: jwt}
+  }
+
+  async verifyJwt(jwt: string): Promise<{exp: number}> {
+    if(!jwt){
+      throw new UnauthorizedException()
+    }
+
+    try{
+      const {exp} = await this.jwtService.verifyAsync(jwt)
+      return {exp}
+    }catch (error){
+      throw new UnauthorizedException()
+    }
   }
 }

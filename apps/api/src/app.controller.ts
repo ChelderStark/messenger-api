@@ -35,4 +35,14 @@ export class AppController {
       firstName, lastName, email, password
     })
   }
+
+  @Post('auth/login')
+  async login(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ){
+    return this.authService.send({cmd: 'login'}, {
+      email, password
+    })
+  }
 }
